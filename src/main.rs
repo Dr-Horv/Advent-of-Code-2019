@@ -1,9 +1,7 @@
-use std::time::{Duration, Instant};
-use std::thread::sleep;
+use std::time::Instant;
 
 mod lib;
-use lib::Solver;
-use lib::read_lines;
+use lib::{Solver, read_lines};
 
 mod day01;
 use day01::Day1Solver;

@@ -31,3 +31,29 @@ impl Solver for Day1Solver {
         return total.to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::lib::test_solver;
+
+
+    #[test]
+    fn test_part_one() {
+        let solver = Day1Solver{};
+        test_solver(&solver, false, &["12"], "2");
+        test_solver(&solver, false, &["14"], "2");
+        test_solver(&solver, false, &["1969"], "654");
+        test_solver(&solver, false, &["100756"], "33583");
+    }
+
+    #[test]
+    fn test_part_two() {
+        let solver = Day1Solver{};
+
+        test_solver(&solver, true, &["14"], "2");
+        test_solver(&solver, true, &["1969"], "966");
+        test_solver(&solver, true, &["100756"], "50346");
+    }
+
+}

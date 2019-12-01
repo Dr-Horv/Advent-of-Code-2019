@@ -11,3 +11,13 @@ pub fn read_lines<P>(filename: P) -> Vec<String>
     let file = File::open(filename).expect("Failed to open file");
     io::BufReader::new(file).lines().filter_map(io::Result::ok).collect()
 }
+
+#[cfg(test)]
+pub fn test_solver(solver: &impl Solver, part_two: bool, input: &[&str], expected_answer: &str) {
+    let lines = input.into_iter()
+        .map(|s| s.to_owned().to_string())
+        .collect();
+
+    let answer = solver.solve(lines, part_two);
+    assert_eq!(answer, String::from(expected_answer));
+}
