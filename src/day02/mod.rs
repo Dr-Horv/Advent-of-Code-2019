@@ -3,48 +3,6 @@ use crate::lib::Solver;
 
 pub(crate) struct Day2Solver {}
 
-fn part_one(lines: Vec<String>) -> String {
-    let program_raw = &lines[0];
-
-    let mut program: Vec<i32> = program_raw
-        .split(",")
-        .map(|s| s.parse::<i32>().unwrap())
-        .collect();
-
-    program[1] = 12;
-    program[2] = 2;
-
-    let mut index = 0;
-    loop {
-        let op = program[index];
-        if op == 99 {
-            break
-        }
-        let a = program[program[index+1] as usize];
-        let b = program[program[index+2] as usize];
-
-        let res = if op == 1 {
-            a + b
-        } else if op == 2 {
-            a * b
-        } else {
-            panic!("Unexpected OP code {}", op)
-        };
-
-        let modify_index = *&program[index+3] as usize;
-        program[modify_index] = res;
-        index += 4;
-    }
-
-    let output = program
-        .iter()
-        .map(|i| i.to_string())
-        .collect::<Vec<String>>()
-        .join(",");
-
-    return output;
-}
-
 impl Solver for Day2Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
         let program_raw = &lines[0];
