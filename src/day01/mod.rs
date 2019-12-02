@@ -13,7 +13,7 @@ impl Solver for Day1Solver {
             return lines
                 .into_iter()
                 .map(|s| s.parse::<i32>().unwrap())
-                .map(|i| calculate_fuel(i))
+                .map( calculate_fuel)
                 .sum::<i32>().to_string()
         }
 
@@ -26,7 +26,7 @@ impl Solver for Day1Solver {
             }
         }
 
-        return total.to_string()
+        total.to_string()
     }
 }
 

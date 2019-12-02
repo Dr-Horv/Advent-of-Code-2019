@@ -6,8 +6,8 @@ pub(crate) struct Day2Solver {}
 impl Solver for Day2Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
         let program_raw = &lines[0];
-        let mut orig_program: Vec<i32> = program_raw
-            .split(",")
+        let orig_program: Vec<i32> = program_raw
+            .split(',')
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
 
@@ -31,14 +31,14 @@ impl Solver for Day2Solver {
 
                 run_program(&mut program);
 
-                if program[0] == 19690720 {
+                if program[0] == 19_690_720 {
                     return (noun * 100 + verb).to_string()
                 }
 
             }
         }
 
-        return String::from("Fail")
+        String::from("Fail")
     }
 }
 
@@ -50,7 +50,7 @@ mod tests {
 
     fn test_program(input: &[&str], expected_answer: &str) {
         let mut program: Vec<i32> = input[0]
-            .split(",")
+            .split(',')
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
 
@@ -107,7 +107,7 @@ fn run_program(program: &mut Vec<i32>) {
             panic!("Unexpected OP code {}", op)
         };
 
-        let modify_index = *&program[index + 3] as usize;
+        let modify_index = program[index + 3] as usize;
         program[modify_index] = res;
         index += 4;
     }
