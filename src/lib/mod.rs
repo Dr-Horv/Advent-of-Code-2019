@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use std::cmp::Eq;
 
 pub trait Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String;
@@ -21,3 +22,41 @@ pub fn test_solver(solver: &impl Solver, part_two: bool, input: &[&str], expecte
     let answer = solver.solve(lines, part_two);
     assert_eq!(answer, String::from(expected_answer));
 }
+
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+pub struct Position {
+    pub x: i32,
+    pub y: i32
+}
+
+impl Position {
+    pub fn left(&self) -> Position {
+        return Position{x: self.x - 1, y: self.y}
+    }
+    pub fn right(&self) -> Position {
+        return Position{x: self.x + 1, y: self.y}
+    }
+    pub fn down(&self) -> Position {
+        return Position{x: self.x, y: self.y - 1}
+    }
+    pub fn up(&self) -> Position {
+        return Position{x: self.x, y: self.y + 1}
+    }
+}
+
+pub fn manhattan_distance(p1: &Position, p2: &Position) -> i32 {
+    return (p1.x - p2.x).abs() + (p1.y - p2.y).abs();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn test_manhattan_distance() {
+        assert_eq!(manhattan_distance(&Position{x: 1, y: 2}, &Position{x: 0, y: 0}), 3);
+        assert_eq!(manhattan_distance(&Position{x: 1, y: 2}, &Position{x: -1, y: 5}), 5);
+    }
+
+}
+
