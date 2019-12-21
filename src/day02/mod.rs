@@ -1,5 +1,6 @@
 
 use crate::lib::Solver;
+use crate::lib::intcode_computer;
 
 pub(crate) struct Day2Solver {}
 
@@ -15,7 +16,7 @@ impl Solver for Day2Solver {
             let mut program: Vec<i32> = orig_program.clone();
             program[1] = 12;
             program[2] = 2;
-            run_program(&mut program);
+            intcode_computer::run_program(vec![0], &mut program);
             return program
                 .iter()
                 .map(|i| i.to_string())
@@ -29,7 +30,7 @@ impl Solver for Day2Solver {
                 program[1] = noun;
                 program[2] = verb;
 
-                run_program(&mut program);
+                intcode_computer::run_program(vec![0], &mut program);
 
                 if program[0] == 19_690_720 {
                     return (noun * 100 + verb).to_string()
@@ -54,7 +55,7 @@ mod tests {
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
 
-        run_program(&mut program);
+        intcode_computer::run_program(vec![0], &mut program);
         let output = program
             .iter()
             .map(|i| i.to_string())
@@ -87,29 +88,5 @@ mod tests {
     }
 
 
-}
-
-fn run_program(program: &mut Vec<i32>) {
-    let mut index = 0;
-    loop {
-        let op = program[index];
-        if op == 99 {
-            break
-        }
-        let a = program[program[index + 1] as usize];
-        let b = program[program[index + 2] as usize];
-
-        let res = if op == 1 {
-            a + b
-        } else if op == 2 {
-            a * b
-        } else {
-            panic!("Unexpected OP code {}", op)
-        };
-
-        let modify_index = program[index + 3] as usize;
-        program[modify_index] = res;
-        index += 4;
-    }
 }
 

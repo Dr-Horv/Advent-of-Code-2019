@@ -32,7 +32,7 @@ impl Solver for Day6Solver {
         if !part_two {
             let mut total_orbits = 0;
             for k in galaxy_map.keys() {
-                total_orbits += calculate_orbits(k, &String::from("COM"), &galaxy_map, ).len() as i32;
+                total_orbits += calculate_orbits(k, &String::from("COM"), &galaxy_map, ).len() as i32 - 1;
 
             }
             return total_orbits.to_string();
