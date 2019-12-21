@@ -1,5 +1,5 @@
-
-
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
 
 fn get_position(program: &Vec<i32>, index: usize) -> i32 {
     return program[program[index] as usize]
@@ -115,14 +115,13 @@ pub fn read_program(raw: &String) -> Vec<i32> {
         .collect()
 }
 
-pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>) -> i32 {
+pub fn run_program(input: Receiver<i32>, output: Sender<i32>, program: &mut Vec<i32>) -> i32 {
     let mut index = 0;
-    let mut input_iterator = input.into_iter();
-    let mut io = 0;
+    let mut io= 0;
     //println!("program={:?}", program);
     loop {
         let mut instruction = program[index];
-        println!("instruction={:?}", instruction);
+        //println!("instruction={:?}", instruction);
         let op = instruction % 100;
         //println!("op={:?}", op);
         instruction = instruction / 100;
@@ -131,13 +130,14 @@ pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>)
             2 => multiply(program, index, instruction),
             3 => {
                 let modify_index = program[index+1] as usize;
-                program[modify_index] = input_iterator.next().unwrap();
+                program[modify_index] = input.recv().unwrap();
                 index + 2
             }
             4 => {
                 let modify_index = program[index+1] as usize;
                 io = program[modify_index];
-                println!("io={} read from={}", io, modify_index);
+                //println!("io={} read from={}", io, modify_index);
+                output.send(io);
                 index + 2
             }
             5 => jump_if_ne(program, index, instruction),
@@ -145,7 +145,7 @@ pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>)
             7 => less_than_check(program, index, instruction),
             8 => equal_check(program, index, instruction),
             99 => {
-                println!("Last output={}", io);
+                //println!("Last output={}", io);
                 return io;
             }
             _ => {
@@ -154,7 +154,7 @@ pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>)
             }
         };
 
-        println!("program={:?}", program);
+        //println!("program={:?}", program);
 
     }
 }

@@ -1,3 +1,6 @@
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+
 
 use crate::lib::Solver;
 use crate::lib::intcode_computer;
@@ -12,7 +15,10 @@ impl Solver for Day2Solver {
             let mut program: Vec<i32> = orig_program.clone();
             program[1] = 12;
             program[2] = 2;
-            intcode_computer::run_program(vec![0], &mut program);
+            let (input_sender, input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+            let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+            input_sender.send(0);
+            intcode_computer::run_program(input_receiver, output_sender, &mut program);
             return program
                 .iter()
                 .map(|i| i.to_string())
@@ -26,7 +32,10 @@ impl Solver for Day2Solver {
                 program[1] = noun;
                 program[2] = verb;
 
-                intcode_computer::run_program(vec![0], &mut program);
+                let (input_sender, input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+                let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+                input_sender.send(0);
+                intcode_computer::run_program(input_receiver, output_sender, &mut program);
 
                 if program[0] == 19_690_720 {
                     return (noun * 100 + verb).to_string()
@@ -51,7 +60,11 @@ mod tests {
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
 
-        intcode_computer::run_program(vec![0], &mut program);
+        let (input_sender, input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        input_sender.send(0);
+
+        intcode_computer::run_program(input_receiver, output_sender, &mut program);
         let output = program
             .iter()
             .map(|i| i.to_string())

@@ -1,3 +1,5 @@
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
 
 
 use crate::lib::Solver;
@@ -10,13 +12,17 @@ impl Solver for Day5Solver {
         let orig_program: Vec<i32> = intcode_computer::read_program(&lines[0]);
 
         let mut program: Vec<i32> = orig_program.clone();
-        let output = if !part_two {
-            intcode_computer::run_program(vec![1], &mut program)
+        let (input_sender, input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        if !part_two {
+            input_sender.send(1);
         } else {
-            intcode_computer::run_program(vec![5], &mut program)
+            input_sender.send(5);
         };
 
-        return output.to_string()
+        intcode_computer::run_program(input_receiver, output_sender, &mut program);
+
+        return output_receiver.recv().unwrap().to_string();
 
     }
 }
@@ -33,7 +39,12 @@ mod tests {
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
 
-        let output = intcode_computer::run_program(vec![input], &mut program);
+
+        let (input_sender, input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        input_sender.send(input);
+        intcode_computer::run_program(input_receiver, output_sender, &mut program);
+        let output = output_receiver.recv().unwrap();
         let output_memory = program
             .iter()
             .map(|i| i.to_string())
