@@ -109,6 +109,12 @@ fn add(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize {
     index + 4
 }
 
+pub fn read_program(raw: &String) -> Vec<i32> {
+    raw.split(',')
+        .map(|s| s.parse::<i32>().unwrap())
+        .collect()
+}
+
 pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>) -> i32 {
     let mut index = 0;
     let mut input_iterator = input.into_iter();

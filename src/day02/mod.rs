@@ -6,11 +6,7 @@ pub(crate) struct Day2Solver {}
 
 impl Solver for Day2Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
-        let program_raw = &lines[0];
-        let orig_program: Vec<i32> = program_raw
-            .split(',')
-            .map(|s| s.parse::<i32>().unwrap())
-            .collect();
+        let orig_program: Vec<i32> = intcode_computer::read_program(&lines[0]);
 
         if !part_two {
             let mut program: Vec<i32> = orig_program.clone();

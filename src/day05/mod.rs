@@ -7,11 +7,7 @@ pub(crate) struct Day5Solver {}
 
 impl Solver for Day5Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
-        let program_raw = &lines[0];
-        let orig_program: Vec<i32> = program_raw
-            .split(',')
-            .map(|s| s.parse::<i32>().unwrap())
-            .collect();
+        let orig_program: Vec<i32> = intcode_computer::read_program(&lines[0]);
 
         let mut program: Vec<i32> = orig_program.clone();
         let output = if !part_two {
