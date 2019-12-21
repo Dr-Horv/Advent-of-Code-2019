@@ -38,6 +38,77 @@ fn jump_if_check(index: usize, a: i32, b: i32, check: fn(i32) -> bool) -> usize 
     }
 }
 
+fn perform_check(index: usize, a: i32, b: i32, check: fn(i32, i32) -> bool, program: &mut Vec<i32>) -> usize {
+    let modify_index = program[index + 3] as usize;
+    if check(a,b) {
+        program[modify_index] = 1;
+    } else {
+        program[modify_index] = 0;
+    }
+    index + 4
+}
+
+
+fn equal_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let (_, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    perform_check(index, a, b, |x, y| x == y, program)
+}
+
+fn less_than_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let (_, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    perform_check(index, a, b, |x, y| x < y, program)
+}
+
+fn jump_if_equal(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    jump_if_check(index, a, b, |x| x == 0)
+}
+
+fn jump_if_ne(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    jump_if_check(index, a, b, |x| x != 0)
+}
+
+fn multiply(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let (mode_res, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    if mode_res != 0 {
+        panic!("Invalid mode res")
+    }
+    apply_binary_operator(a, b, |x, y| x * y, index, program);
+    index + 4
+}
+
+fn add(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize {
+    let (mode_a, instruction) = get_next_mode(instruction);
+    let (mode_b, instruction) = get_next_mode(instruction);
+    let (mode_res, instruction) = get_next_mode(instruction);
+    let a = get_parameter(program, index + 1, mode_a);
+    let b = get_parameter(program, index + 2, mode_b);
+    if mode_res != 0 {
+        panic!("Invalid mode res")
+    }
+    apply_binary_operator(a, b, |x, y| x + y, index, program);
+    index + 4
+}
+
 pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>) -> i32 {
     let mut index = 0;
     let mut input_iterator = input.into_iter();
@@ -49,86 +120,24 @@ pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>)
         let op = instruction % 100;
         //println!("op={:?}", op);
         instruction = instruction / 100;
-        match op {
-            1 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let (mode_res, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                if mode_res != 0 {
-                    panic!("Invalid mode res")
-                }
-                apply_binary_operator(a, b, |x,y| x+y, index, program);
-                index += 4;
-            }
-            2 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let (mode_res, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                if mode_res != 0 {
-                    panic!("Invalid mode res")
-                }
-                apply_binary_operator(a, b, |x,y| x*y, index, program);
-                index += 4;
-            }
+        index = match op {
+            1 => add(program, index, instruction),
+            2 => multiply(program, index, instruction),
             3 => {
                 let modify_index = program[index+1] as usize;
                 program[modify_index] = input_iterator.next().unwrap();
-                index += 2;
-                println!("io={} stored at={}", io, modify_index);
+                index + 2
             }
             4 => {
                 let modify_index = program[index+1] as usize;
                 io = program[modify_index];
-                index += 2;
                 println!("io={} read from={}", io, modify_index);
+                index + 2
             }
-            5 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                index = jump_if_check(index, a, b, |x| x != 0)
-            }
-            6 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                index = jump_if_check(index, a, b, |x| x == 0);
-            }
-            7 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let (_, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                let modify_index = program[index + 3] as usize;
-                if a < b {
-                    program[modify_index] = 1;
-                } else {
-                    program[modify_index] = 0;
-                }
-                index += 4;
-            }
-            8 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
-                let (mode_b, instruction) = get_next_mode(instruction);
-                let (_, instruction) = get_next_mode(instruction);
-                let a = get_parameter(program, index+1, mode_a);
-                let b = get_parameter(program, index+2, mode_b);
-                let modify_index = program[index + 3] as usize;
-                println!("a={} b={} index={}", a, b, index);
-                if a == b {
-                    program[modify_index] = 1;
-                } else {
-                    program[modify_index] = 0;
-                }
-                index += 4;
-            }
+            5 => jump_if_ne(program, index, instruction),
+            6 => jump_if_equal(program, index, instruction),
+            7 => less_than_check(program, index, instruction),
+            8 => equal_check(program, index, instruction),
             99 => {
                 println!("Last output={}", io);
                 return io;
@@ -137,7 +146,7 @@ pub fn run_program(input: impl IntoIterator<Item = i32>, program: &mut Vec<i32>)
                 println!("Op code={}", op);
                 panic!("Invalid op code")
             }
-        }
+        };
 
         println!("program={:?}", program);
 
