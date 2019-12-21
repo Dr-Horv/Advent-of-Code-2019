@@ -15,7 +15,7 @@ fn get_next_mode(instruction: i32) -> (i32, i32) {
     return (mode, new_inst)
 }
 
-fn get_parameter(program: &mut Vec<i32>, mut index: usize, mode: i32) -> i32 {
+fn get_parameter(program: &mut Vec<i32>, index: usize, mode: i32) -> i32 {
     match mode {
         0 => get_position(program, index),
         1 => get_immediate(program, index),
@@ -49,7 +49,7 @@ fn perform_check(index: usize, a: i32, b: i32, check: fn(i32, i32) -> bool, prog
 }
 
 
-fn equal_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+fn equal_check(program: &mut Vec<i32>, index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let (_, instruction) = get_next_mode(instruction);
@@ -58,7 +58,7 @@ fn equal_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -
     perform_check(index, a, b, |x, y| x == y, program)
 }
 
-fn less_than_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+fn less_than_check(program: &mut Vec<i32>, mut index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let (_, instruction) = get_next_mode(instruction);
@@ -67,7 +67,7 @@ fn less_than_check(program: &mut Vec<i32>, mut index: usize, mut instruction: i3
     perform_check(index, a, b, |x, y| x < y, program)
 }
 
-fn jump_if_equal(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+fn jump_if_equal(program: &mut Vec<i32>, mut index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let a = get_parameter(program, index + 1, mode_a);
@@ -75,7 +75,7 @@ fn jump_if_equal(program: &mut Vec<i32>, mut index: usize, mut instruction: i32)
     jump_if_check(index, a, b, |x| x == 0)
 }
 
-fn jump_if_ne(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) -> usize {
+fn jump_if_ne(program: &mut Vec<i32>, mut index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let a = get_parameter(program, index + 1, mode_a);
@@ -83,7 +83,7 @@ fn jump_if_ne(program: &mut Vec<i32>, mut index: usize, mut instruction: i32) ->
     jump_if_check(index, a, b, |x| x != 0)
 }
 
-fn multiply(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize {
+fn multiply(program: &mut Vec<i32>, index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let (mode_res, instruction) = get_next_mode(instruction);
@@ -96,7 +96,7 @@ fn multiply(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize
     index + 4
 }
 
-fn add(program: &mut Vec<i32>, index: usize, mut instruction: i32) -> usize {
+fn add(program: &mut Vec<i32>, index: usize, instruction: i32) -> usize {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
     let (mode_res, instruction) = get_next_mode(instruction);
