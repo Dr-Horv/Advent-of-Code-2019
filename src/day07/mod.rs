@@ -7,7 +7,7 @@ use crate::lib::intcode_computer;
 
 pub(crate) struct Day7Solver {}
 
-fn valid(a: i32, b: i32, c: i32, d: i32, e: i32) -> bool {
+fn valid(a: i128, b: i128, c: i128, d: i128, e: i128) -> bool {
     a != b && a != c && a != d && a != e &&
         b != c && b != d && b != e &&
         c != d && c != e &&
@@ -18,9 +18,9 @@ impl Solver for Day7Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
         let orig_program = intcode_computer::read_program(&lines[0]);
 
-        let mut max = 0;
+        let mut max: i128 = 0;
         let mut sequence = String::new();
-        let low_bound = if !part_two { 0 } else { 5 };
+        let low_bound: i128 = if !part_two { 0 } else { 5 };
         let upper_bound = if !part_two { 4 } else { 9 };
 
 
@@ -30,17 +30,17 @@ impl Solver for Day7Solver {
                     for d in low_bound..=upper_bound {
                         for e in low_bound..=upper_bound {
                             if valid(a, b, c, d, e) {
-                                let mut program_a: Vec<i32> = orig_program.clone();
-                                let mut program_b: Vec<i32> = orig_program.clone();
-                                let mut program_c: Vec<i32> = orig_program.clone();
-                                let mut program_d: Vec<i32> = orig_program.clone();
-                                let mut program_e: Vec<i32> = orig_program.clone();
-                                let (a_input_sender, a_input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
-                                let (b_input_sender, b_input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
-                                let (c_input_sender, c_input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
-                                let (d_input_sender, d_input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
-                                let (e_input_sender, e_input_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
-                                let (output_sender, output_receiver): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+                                let mut program_a = orig_program.clone();
+                                let mut program_b = orig_program.clone();
+                                let mut program_c = orig_program.clone();
+                                let mut program_d = orig_program.clone();
+                                let mut program_e = orig_program.clone();
+                                let (a_input_sender, a_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                                let (b_input_sender, b_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                                let (c_input_sender, c_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                                let (d_input_sender, d_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                                let (e_input_sender, e_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                                let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
 
                                 a_input_sender.send(a);
                                 b_input_sender.send(b);
@@ -87,7 +87,8 @@ impl Solver for Day7Solver {
                                     });
 
                                     let out = vec![ah, bh, ch, dh, eh].into_iter().map(|h| {
-                                        h.join().unwrap()
+                                        let (io, _) = h.join().unwrap();
+                                        io
                                     }).last().unwrap();
 
                                     if out > max {

@@ -21,8 +21,8 @@ pub fn test_solver(solver: &impl Solver, part_two: bool, input: &[&str], expecte
         .map(|s| s.to_owned().to_string())
         .collect();
 
-    let answer = solver.solve(lines, part_two);
-    assert_eq!(answer, String::from(expected_answer));
+    let answer = solver.solve(lines, part_two);;
+    assert_eq!(answer, expected_answer);
 }
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone)]

@@ -1,5 +1,4 @@
 use crate::lib::Solver;
-use std::ops::Add;
 
 pub(crate) struct Day8Solver {}
 
