@@ -1,7 +1,6 @@
 
 use std::collections::HashMap;
 
-
 use crate::lib::{Solver, Position, real_distance};
 use std::f64::consts::PI;
 use std::ops::{Div, Mul};
@@ -33,7 +32,6 @@ impl Solver for Day10Solver {
     fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
         let mut asteroid_map = HashMap::new();
         let mut asteroid_map_vision = HashMap::new();
-
         let height = lines.len();
         let width = lines[0].len();
         for y in 0..lines.len() {
@@ -57,14 +55,11 @@ impl Solver for Day10Solver {
                     continue
                 }
                 if has_line_of_sight(p1, p2, &asteroid_map) {
-                    //println!("can see={},{}", p2.x, p2.y);
                     count += 1
                 }
             }
 
-            //println!("Curr={},{} can see {}", p1.x, p1.y, count);
             asteroid_map_vision.insert(p1, count);
-
             if count > max {
                 max = count;
                 best = p1;
@@ -83,8 +78,6 @@ impl Solver for Day10Solver {
             }
         }
 
-
-        println!("{}", map);
 
         println!("Best={},{} can see {}", best.x, best.y, max);
 
@@ -110,17 +103,11 @@ impl Solver for Day10Solver {
             return a.angle.partial_cmp(&b.angle).unwrap()
         });
 
-        //asteroids.reverse();
-
         let mut a_map_copy = asteroid_map.clone();
         let mut count = 0;
         let mut asteroids_to_remove = Vec::new();
         loop {
             for a in asteroids.iter() {
-                /*
-                if asteroids_to_remove.iter().any(|aa: &Asteroid| aa.original_pos == a.original_pos) {
-                    continue
-                }*/
                 if a.original_pos != *best && has_line_of_sight(best, &a.original_pos, &a_map_copy) {
                     count += 1;
                     println!("{} Asteroid={},{} angle {}", count, a.original_pos.x, a.original_pos.y, a.angle);
