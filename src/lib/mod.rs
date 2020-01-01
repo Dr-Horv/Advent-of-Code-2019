@@ -25,7 +25,7 @@ pub fn test_solver(solver: &impl Solver, part_two: bool, input: &[&str], expecte
     assert_eq!(answer, expected_answer);
 }
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 pub struct Position {
     pub x: i32,
     pub y: i32
@@ -48,6 +48,10 @@ impl Position {
 
 pub fn manhattan_distance(p1: &Position, p2: &Position) -> i32 {
     return (p1.x - p2.x).abs() + (p1.y - p2.y).abs();
+}
+
+pub fn real_distance(p1: &Position, p2: &Position) -> f64 {
+    return ( (p1.x - p2.x).pow(2) as f64 + (p1.y - p2.y).pow(2) as f64 ).sqrt()
 }
 
 #[cfg(test)]
