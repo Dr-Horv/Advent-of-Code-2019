@@ -1,4 +1,4 @@
-#![feature(crate_in_paths)]
+//#![feature(crate_in_paths)]
 
 use std::time::Instant;
 
@@ -25,6 +25,8 @@ mod day09;
 use day09::Day9Solver;
 mod day10;
 use day10::Day10Solver;
+mod day11;
+use day11::Day11Solver;
 
 
 
@@ -42,6 +44,7 @@ fn get_solver(day: i32) -> (Box<dyn Solver>, String) {
         8 => Box::new(Day8Solver{}),
         9 => Box::new(Day9Solver{}),
         10 => Box::new(Day10Solver{}),
+        11 => Box::new(Day11Solver{}),
         _ => panic!("Failed")
     };
     (solver, file)
@@ -49,7 +52,7 @@ fn get_solver(day: i32) -> (Box<dyn Solver>, String) {
 }
 
 fn main() {
-    let day = 10;
+    let day = 11;
     let (solver, file) = get_solver(day);
     let now = Instant::now();
     let answer: String = solver.solve(read_lines(file), true);
