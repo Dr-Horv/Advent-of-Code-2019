@@ -3,7 +3,7 @@ extern crate regex;
 
 use regex::Regex;
 use core::fmt;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashSet};
 
 pub(crate) struct Day12Solver {}
 
@@ -106,7 +106,7 @@ impl Solver for Day12Solver {
             }).collect();
 
         if !part_two {
-            for step in 0..1000 {
+            for _ in 0..1000 {
                 simulate_step(&mut moons)
             }
 
@@ -159,7 +159,7 @@ impl Solver for Day12Solver {
 }
 
 fn gcd(mut a: u128, mut b: u128) -> u128 {
-    let mut t = b;
+    let mut t: u128;
     loop {
         if b == 0 {
             return a;

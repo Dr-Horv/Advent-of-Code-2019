@@ -19,7 +19,6 @@ impl Solver for Day7Solver {
         let orig_program = intcode_computer::read_program(&lines[0]);
 
         let mut max: i128 = 0;
-        let mut sequence = String::new();
         let low_bound: i128 = if !part_two { 0 } else { 5 };
         let upper_bound = if !part_two { 4 } else { 9 };
 
@@ -42,11 +41,11 @@ impl Solver for Day7Solver {
                                 let (e_input_sender, e_input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
                                 let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
 
-                                a_input_sender.send(a);
-                                b_input_sender.send(b);
-                                c_input_sender.send(c);
-                                d_input_sender.send(d);
-                                e_input_sender.send(e);
+                                a_input_sender.send(a).ok();
+                                b_input_sender.send(b).ok();
+                                c_input_sender.send(c).ok();
+                                d_input_sender.send(d).ok();
+                                e_input_sender.send(e).ok();
 
                                 let ah = thread::spawn(move || {
                                     intcode_computer::run_program(a_input_receiver, b_input_sender, &mut program_a)
@@ -69,19 +68,18 @@ impl Solver for Day7Solver {
                                 });
 
                                 if !part_two {
-                                    a_input_sender.send(0);
+                                    a_input_sender.send(0).ok();
                                     let out = output_receiver.recv().unwrap();
                                     if out > max {
                                         max = out;
-                                        sequence = format!("{}{}{}{}{}", a, b, c, d, e);
                                     }
                                 } else {
                                     thread::spawn(move || {
-                                        a_input_sender.send(0);
+                                        a_input_sender.send(0).ok();
                                         loop {
                                             let out_result = output_receiver.recv();
                                             if out_result.is_ok() {
-                                                a_input_sender.send(out_result.unwrap());
+                                                a_input_sender.send(out_result.unwrap()).ok();
                                             }
                                         }
                                     });
@@ -93,7 +91,6 @@ impl Solver for Day7Solver {
 
                                     if out > max {
                                         max = out;
-                                        sequence = format!("{}{}{}{}{}", a, b, c, d, e);
                                     }
                                 }
 

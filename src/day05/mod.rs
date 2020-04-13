@@ -15,9 +15,9 @@ impl Solver for Day5Solver {
         let (input_sender, input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
         let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
         if !part_two {
-            input_sender.send(1);
+            input_sender.send(1).ok();
         } else {
-            input_sender.send(5);
+            input_sender.send(5).ok();
         };
 
         intcode_computer::run_program(input_receiver, output_sender, &mut program);

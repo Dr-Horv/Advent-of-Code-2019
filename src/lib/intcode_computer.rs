@@ -1,5 +1,4 @@
 use std::sync::mpsc::{Sender, Receiver};
-use std::sync::mpsc;
 
 use std::collections::HashMap;
 
@@ -71,7 +70,7 @@ fn perform_check(index: i128, a: i128, b: i128, check: fn(i128, i128) -> bool, m
 fn equal_check(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
-    let (mode_c, instruction) = get_next_mode(instruction);
+    let (mode_c, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     let c = get_output_parameter(memory, index + 3, mode_c, relative_base);
@@ -79,10 +78,10 @@ fn equal_check(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i12
     index + 4
 }
 
-fn less_than_check(memory: &mut HashMap<i128, i128>, mut index: i128, relative_base: i128, instruction: i128) -> i128 {
+fn less_than_check(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
-    let (mode_c, instruction) = get_next_mode(instruction);
+    let (mode_c, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     let c = get_output_parameter(memory, index + 3, mode_c, relative_base);
@@ -90,17 +89,17 @@ fn less_than_check(memory: &mut HashMap<i128, i128>, mut index: i128, relative_b
     index + 4
 }
 
-fn jump_if_equal(memory: &mut HashMap<i128, i128>, mut index: i128, relative_base: i128, instruction: i128) -> i128 {
+fn jump_if_equal(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
-    let (mode_b, instruction) = get_next_mode(instruction);
+    let (mode_b, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     jump_if_check(index, a, b, |x| x == 0)
 }
 
-fn jump_if_ne(memory: &mut HashMap<i128, i128>, mut index: i128, relative_base: i128, instruction: i128) -> i128 {
+fn jump_if_ne(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
-    let (mode_b, instruction) = get_next_mode(instruction);
+    let (mode_b, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     jump_if_check(index, a, b, |x| x != 0)
@@ -109,7 +108,7 @@ fn jump_if_ne(memory: &mut HashMap<i128, i128>, mut index: i128, relative_base: 
 fn multiply(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
-    let (mode_res, instruction) = get_next_mode(instruction);
+    let (mode_res, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     let c = get_output_parameter(memory, index+3, mode_res, relative_base);
@@ -120,7 +119,7 @@ fn multiply(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, 
 fn add(memory: &mut HashMap<i128, i128>, index: i128, relative_base: i128, instruction: i128) -> i128 {
     let (mode_a, instruction) = get_next_mode(instruction);
     let (mode_b, instruction) = get_next_mode(instruction);
-    let (mode_res, instruction) = get_next_mode(instruction);
+    let (mode_res, _) = get_next_mode(instruction);
     let a = get_parameter(memory, index + 1, mode_a, relative_base);
     let b = get_parameter(memory, index + 2, mode_b, relative_base);
     let c = get_output_parameter(memory, index+3, mode_res, relative_base);
@@ -155,7 +154,7 @@ pub fn run_program(input: Receiver<i128>, output: Sender<i128>, program: &Vec<i1
             1 => add(&mut memory, index, relative_base, instruction),
             2 => multiply(&mut memory, index, relative_base, instruction),
             3 => {
-                let (mode, instruction) = get_next_mode(instruction);
+                let (mode, _) = get_next_mode(instruction);
                 match mode {
                     0 => {
                         let modify_index = *memory.get(&(index+1)).unwrap_or(&DEFAULT_MEMORY);
@@ -176,22 +175,22 @@ pub fn run_program(input: Receiver<i128>, output: Sender<i128>, program: &Vec<i1
                 index + 2
             }
             4 => {
-                let (mode, instruction) = get_next_mode(instruction);
+                let (mode, _) = get_next_mode(instruction);
                 match mode {
                     0 => {
                         let modify_index = *memory.get(&(index+1)).unwrap_or(&DEFAULT_MEMORY);
                         io = *memory.get(&modify_index).unwrap_or(&DEFAULT_MEMORY);
-                        output.send(io);
+                        output.send(io).ok();
                     }
                     1 => {
                         io = *memory.get(&(index+1)).unwrap_or(&DEFAULT_MEMORY);
-                        output.send(io);
+                        output.send(io).ok();
                     }
                     2 => {
                         let parameter_index = *memory.get(&(index+1)).unwrap_or(&DEFAULT_MEMORY);
                         let modify_index = parameter_index + relative_base;
                         io = *memory.get(&modify_index).unwrap_or(&DEFAULT_MEMORY);
-                        output.send(io);
+                        output.send(io).ok();
                     }
                     _ => panic!("Invalid mode")
                 }
@@ -202,7 +201,7 @@ pub fn run_program(input: Receiver<i128>, output: Sender<i128>, program: &Vec<i1
             7 => less_than_check(&mut memory, index, relative_base, instruction),
             8 => equal_check(&mut memory, index, relative_base, instruction),
             9 => {
-                let (mode_a, instruction) = get_next_mode(instruction);
+                let (mode_a, _) = get_next_mode(instruction);
                 let a = get_parameter(&mut memory, index + 1, mode_a, relative_base) as i128;
                 relative_base += a;
                 index + 2

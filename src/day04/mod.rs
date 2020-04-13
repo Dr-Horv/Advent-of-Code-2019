@@ -47,7 +47,7 @@ fn check_number(a: i32) -> bool {
 }
 
 impl Solver for Day4Solver {
-    fn solve(&self, lines: Vec<String>, part_two: bool) -> String {
+    fn solve(&self, _lines: Vec<String>, _part_two: bool) -> String {
         let mut count = 0;
         // 372304-847060
         for a in 372304..=847060 {

@@ -51,7 +51,7 @@ fn print_state(bot: &PaintRobot, painting: &HashMap<Position, bool>) -> String {
     let mut min_y = bot.position.y;
     let mut max_x = bot.position.x;
     let mut max_y = bot.position.y;
-    for (p, b) in painting.iter() {
+    for (p, _) in painting.iter() {
         if p.x < min_x {
             min_x = p.x;
         }
@@ -98,25 +98,20 @@ impl Solver for Day11Solver {
         let (input_sender, input_receiver) = mpsc::channel();
         let (output_sender, output_receiver) = mpsc::channel();
         if part_two {
-            input_sender.send(1);
+            input_sender.send(1).ok();
         } else {
-            input_sender.send(0);
+            input_sender.send(0).ok();
         }
-        let bot_computer = thread::spawn(move || {
+        thread::spawn(move || {
             intcode_computer::run_program(input_receiver, output_sender, &mut program);
         });
 
         let mut painting = HashMap::new();
         let mut bot = PaintRobot { position: Position { x: 0, y: 0 }, orientation: UP };
-        let mut latest = 0;
         let mut painting_mode = true;
-        let mut loops = 0;
         loop {
-            // print_state(&bot, &painting);
             match output_receiver.recv() {
                 Ok(o) => {
-                    latest = o;
-                    //println!("Output={} Painting_mode={}", o, painting_mode);
                     if painting_mode {
                         let painting_white = if o == 0 {
                             false
@@ -126,7 +121,6 @@ impl Solver for Day11Solver {
                             panic!("Unexpected input!")
                         };
                         painting.insert(bot.position, painting_white);
-                        //println!("Painting={} at={:?}", painting_white, bot.position);
                         painting_mode = false;
                     } else {
                         if o == 0 {
@@ -134,15 +128,12 @@ impl Solver for Day11Solver {
                         } else if o == 1 {
                             bot.orientation = turn_right(&bot.orientation)
                         }
-                        let now = bot.position;
                         bot.position = move_bot(&bot);
-                        let after = bot.position;
                         let is_white = painting.get(&bot.position).unwrap_or(&false);
-                        //println!("Turned {} and moving from {:?} to {:?} reading {}", if o == 0 { "LEFT" } else { "RIGHT" }, now, after, *is_white);
                         if *is_white {
-                            input_sender.send(1);
+                            input_sender.send(1).ok();
                         } else {
-                            input_sender.send(0);
+                            input_sender.send(0).ok();
                         }
 
                         painting_mode = true;
@@ -150,7 +141,6 @@ impl Solver for Day11Solver {
                 }
                 _ => return if part_two { print_state(&bot, &painting) } else { painting.len().to_string() }
             }
-            loops += 1;
         }
     }
 }

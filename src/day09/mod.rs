@@ -1,4 +1,3 @@
-use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 
 use crate::lib::Solver;
@@ -14,7 +13,7 @@ impl Solver for Day9Solver {
 
         let input = if !part_two { 1 } else { 2 };
 
-        input_sender.send(input);
+        input_sender.send(input).ok();
         intcode_computer::run_program(input_receiver, output_sender, &mut program);
 
         let mut latest = 0;

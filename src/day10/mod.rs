@@ -3,8 +3,6 @@ use std::collections::HashMap;
 
 use crate::lib::{Solver, Position, real_distance};
 use std::f64::consts::PI;
-use std::ops::{Div, Mul};
-use std::cmp::Ordering;
 
 struct Asteroid {
     pub relative_pos: Position,
@@ -20,7 +18,6 @@ fn has_line_of_sight(p1: &Position, p2: &Position, asteroid_map: &HashMap<Positi
         .filter( |&(k,_)|  p1 != k && p2 != k)
         .any(|(p, _)| {
             let relative_pos_a = Position{x: p1.x - p.x, y: p1.y - p.y};
-            let relative_pos_b = Position{x: p2.x - p.x, y: p2.y - p.y};
             let a = (relative_pos.y as f64).atan2(relative_pos.x as f64);
             let b = (relative_pos_a.y as f64).atan2(relative_pos_a.x as f64);
 
@@ -91,7 +88,6 @@ impl Solver for Day10Solver {
                 let relative_pos = Position{x: best.x - a.x, y: best.y - a.y};
                 let pos = Position{x: a.x, y: a.y};
                 let a = (relative_pos.y as f64).atan2(relative_pos.x as f64);
-                let b = if a < 0.0 { a.abs() + PI } else { a };
                 let c = a - PI/2.0;
                 let d = if c < 0.0 { PI*2.0+c } else { c };
                 let angle = d;

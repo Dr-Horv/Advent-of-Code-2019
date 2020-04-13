@@ -61,20 +61,19 @@ impl Solver for Day13Solver {
 
         let (input_sender, input_receiver) = mpsc::channel();
         let (output_sender, output_receiver) = mpsc::channel();
-        let bot_computer = thread::spawn(move || {
+        thread::spawn(move || {
             intcode_computer::run_program(input_receiver, output_sender, &mut program);
         });
 
-        let mut loops = 0;
         let mut state = State::X;
         let mut tmp_x: i32 = -1;
         let mut tmp_y: i32 = -1;
-        let mut tmp_tile_type: TileType = TileType::Empty;
+        let mut tmp_tile_type: TileType;
         let mut screen = HashMap::new();
         let mut score: i32 = 0;
         let mut paddle: Tile = Tile{x: -1, y: -1, tile_type: TileType::HorizontalPaddle};
-        let mut ball: Tile = Tile{x: -1, y: -1, tile_type: TileType::Ball};
-        input_sender.send(0);
+        let mut ball: Tile;
+        input_sender.send(0).ok();
         loop {
             // print_state(&bot, &painting);
             match output_receiver.recv() {
@@ -104,7 +103,7 @@ impl Solver for Day13Solver {
                                     ball = t.clone();
                                     if paddle.x != -1 {
                                         let next_move = get_next_move(paddle.x, ball.x);
-                                        input_sender.send(next_move as i128);
+                                        input_sender.send(next_move as i128).ok();
                                     }
                                 }
                             } else {
@@ -116,7 +115,6 @@ impl Solver for Day13Solver {
                 }
                 _ => return if !part_two { calculate_block_tiles(screen).to_string() } else { score.to_string() }
             }
-            loops += 1;
         }
     }
 }

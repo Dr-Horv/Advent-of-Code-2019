@@ -16,9 +16,9 @@ impl Solver for Day2Solver {
             program[1] = 12;
             program[2] = 2;
             let (input_sender, input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
-            let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
-            input_sender.send(0);
-            let (io, memory ) = intcode_computer::run_program(input_receiver, output_sender, &mut program);
+            let (output_sender, _): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+            input_sender.send(0).ok();
+            let (_, memory ) = intcode_computer::run_program(input_receiver, output_sender, &mut program);
             return memory.get(&0).unwrap().to_string()
 
         }
@@ -30,9 +30,9 @@ impl Solver for Day2Solver {
                 program[2] = verb;
 
                 let (input_sender, input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
-                let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
-                input_sender.send(0);
-                let (io, memory) = intcode_computer::run_program(input_receiver, output_sender, &mut program);
+                let (output_sender, _): (Sender<i128>, Receiver<i128>) = mpsc::channel();
+                input_sender.send(0).ok();
+                let (_, memory) = intcode_computer::run_program(input_receiver, output_sender, &mut program);
 
                 if *memory.get(&0).unwrap() == 19_690_720 {
                     return (noun * 100 + verb).to_string()
@@ -61,7 +61,7 @@ mod tests {
 
         let (input_sender, input_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
         let (output_sender, output_receiver): (Sender<i128>, Receiver<i128>) = mpsc::channel();
-        input_sender.send(0);
+        input_sender.send(0).ok();
 
         let (_, memory) = intcode_computer::run_program(input_receiver, output_sender, &mut program);
         let mut output_memory = Vec::with_capacity(memory.len());
