@@ -35,7 +35,8 @@ mod day14;
 use day14::Day14Solver;
 mod day15;
 use day15::Day15Solver;
-
+mod day16;
+use day16::Day16Solver;
 
 fn get_solver(day: i32) -> (Box<dyn Solver>, String) {
     let day_str = format!("{:02}", day);
@@ -56,6 +57,7 @@ fn get_solver(day: i32) -> (Box<dyn Solver>, String) {
         13 => Box::new(Day13Solver{}),
         14 => Box::new(Day14Solver{}),
         15 => Box::new(Day15Solver{}),
+        16 => Box::new(Day16Solver{}),
         _ => panic!("Failed")
     };
     (solver, file)
@@ -63,7 +65,7 @@ fn get_solver(day: i32) -> (Box<dyn Solver>, String) {
 }
 
 fn main() {
-    let day = 15;
+    let day = 16;
     let (solver, file) = get_solver(day);
     let now = Instant::now();
     let answer: String = solver.solve(read_lines(file), true);
